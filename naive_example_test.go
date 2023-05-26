@@ -24,7 +24,7 @@ func ExampleNaiveKNN() {
 
 	// Perform the KNN search
 	k := 2
-	result := knn.KNN(k, target)
+	result := knn.Search(k, target)
 
 	// Print the result
 	for _, vec := range result {

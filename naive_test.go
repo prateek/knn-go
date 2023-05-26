@@ -36,7 +36,7 @@ func TestKNN(t *testing.T) {
 	require.NoError(t, err)
 
 	target := Vector{Point: []float64{1, 1}}
-	result := knn.KNN(2, target)
+	result := knn.Search(2, target)
 
 	require.Len(t, result, 2)
 	require.Contains(t, result, vecs[0])

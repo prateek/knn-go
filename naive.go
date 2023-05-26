@@ -64,7 +64,7 @@ func NewNaiveKNN(vecs []Vector, fn DistanceFn) (*NaiveKNN, error) {
 	}, nil
 }
 
-func (n *NaiveKNN) KNN(k int, targetVector Vector) []Vector {
+func (n *NaiveKNN) Search(k int, targetVector Vector) []Vector {
 	if k >= len(n.vectors) {
 		// return all known vectors
 		// TODO: do we want to sort by distance?

@@ -27,5 +27,5 @@ func CosineDistance(a, b Vector) float64 {
 }
 
 type KNN interface {
-	KNN(k int, targetVector Vector) []Vector
+	Search(k int, targetVector Vector) []Vector
 }

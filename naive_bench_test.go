@@ -72,7 +72,7 @@ func BenchmarkNaiveKNN(b *testing.B) {
 					knn, _ := NewNaiveKNN(vectors, CosineDistance)
 					b.ResetTimer()
 					for i := 0; i < b.N; i++ {
-						knn.KNN(k, targetVector)
+						knn.Search(k, targetVector)
 					}
 				})
 			}
