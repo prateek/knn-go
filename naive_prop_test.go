@@ -1,6 +1,7 @@
 package knn
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"testing"
@@ -8,6 +9,7 @@ import (
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNaiveKNNProperty(t *testing.T) {
@@ -21,7 +23,9 @@ func TestNaiveKNNProperty(t *testing.T) {
 
 	genK := gen.IntRange(1, 10)
 
-	genVectorsSlice := gen.SliceOf(genVectors)
+	genVectorsSlice := gen.SliceOf(genVectors).SuchThat(func(v []Vector) bool {
+		return len(v) > 0
+	})
 
 	properties.Property("NaiveKNN.Search should return k vectors", prop.ForAll(
 		func(vecs []Vector, k int) bool {
@@ -74,11 +78,14 @@ func TestNaiveKNNProperty(t *testing.T) {
 	))
 
 	properties.Property("NaiveKNN.Search should return k closest vectors to the target", prop.ForAll(
-		func(vecs []Vector, k int, target Vector) bool {
+		func(vecs []Vector, k int, target Vector) (bool, error) {
 			if len(vecs) < k {
-				return true // Not enough vectors to test this property
+				return true, nil // Not enough vectors to test this property
 			}
-			naiveKNN, _ := NewNaiveKNN(vecs, CosineDistance)
+			naiveKNN, err := NewNaiveKNN(vecs, CosineDistance)
+			if err != nil {
+				return false, err
+			}
 			kNearest := naiveKNN.Search(k, target)
 
 			// Compute all distances and sort them
@@ -105,11 +112,39 @@ func TestNaiveKNNProperty(t *testing.T) {
 					}
 				}
 				if !found {
-					return false
+					return false, fmt.Errorf("did not find expected distance %f in shortest %d distances", kd, k)
 				}
 			}
 
-			return true
+			return true, nil
+		},
+		genVectorsSlice,
+		genK,
+		genVectors,
+	))
+
+	properties.Property("NaiveKNN.KNN should return values ordered closest to furthest", prop.ForAll(
+		func(vecs []Vector, k int, target Vector) (bool, error) {
+			naiveKNN, err := NewNaiveKNN(vecs, CosineDistance)
+			if err != nil {
+				return false, err
+			}
+			results := naiveKNN.Search(k, target)
+
+			// Calculate the distance from target to each result vector
+			distances := make([]float64, len(results))
+			for i, result := range results {
+				distances[i] = CosineDistance(target, result)
+			}
+
+			// Check if the distances are in ascending order
+			for i := 0; i < len(results)-1; i++ {
+				if distances[i] > distances[i+1]+_tolerance {
+					return false, fmt.Errorf("distances not in ascending order")
+				}
+			}
+
+			return true, nil
 		},
 		genVectorsSlice,
 		genK,
@@ -117,4 +152,26 @@ func TestNaiveKNNProperty(t *testing.T) {
 	))
 
 	properties.TestingRun(t)
+}
+
+func TestNaiveKNNFailedOrderCheck(t *testing.T) {
+	vecs := []Vector{
+		{ID: "1", Point: []float64{-336385.56231209706, -209830.96853725868}},
+		{ID: "2", Point: []float64{-334181.08546641236, 430176.9241516462}},
+	}
+
+	targetVector := Vector{
+		ID: "3", Point: []float64{79021.84705465887, 748382.334697546},
+	}
+
+	knn, err := NewNaiveKNN(vecs, CosineDistance)
+	require.NoError(t, err)
+
+	result := knn.Search(2, targetVector)
+
+	require.Len(t, result, 2)
+	require.Contains(t, result, vecs[0])
+	require.Contains(t, result, vecs[1])
+	require.Equal(t, "2", string(result[0].ID))
+	require.Equal(t, "1", string(result[1].ID))
 }

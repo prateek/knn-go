@@ -66,30 +66,24 @@ func NewNaiveKNN(vecs []Vector, fn DistanceFn) (*NaiveKNN, error) {
 
 func (n *NaiveKNN) Search(k int, targetVector Vector) []Vector {
 	if k >= len(n.vectors) {
-		// return all known vectors
-		// TODO: do we want to sort by distance?
-		return n.vectors
+		k = len(n.vectors)
 	}
 
-	pq := make(pQueue, k)
-	for i := 0; i < k; i++ {
-		pq[i] = &pqItem{
-			Vector: n.vectors[i],
-			Dist:   CosineDistance(targetVector, n.vectors[i]),
-		}
-	}
-	heap.Init(&pq)
-
-	for _, vector := range n.vectors[k:] {
+	pq := make(pQueue, 0, k)
+	for _, vector := range n.vectors {
 		dist := CosineDistance(targetVector, vector)
-		if dist < pq[0].Dist {
+		item := &pqItem{Vector: vector, Dist: dist}
+
+		if pq.Len() < k {
+			heap.Push(&pq, item)
+		} else if dist < pq[0].Dist {
 			heap.Pop(&pq)
-			heap.Push(&pq, &pqItem{Vector: vector, Dist: dist})
+			heap.Push(&pq, item)
 		}
 	}
 
 	results := make([]Vector, k)
-	for i := range results {
+	for i := k - 1; i >= 0; i-- {
 		results[i] = heap.Pop(&pq).(*pqItem).Vector
 	}
 

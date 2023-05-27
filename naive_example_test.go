@@ -20,7 +20,7 @@ func ExampleNaiveKNN() {
 	}
 
 	// Define the target vector
-	target := Vector{ID: "target", Point: []float64{0.0, 0.0, 0.0}}
+	target := Vector{ID: "target", Point: []float64{1., 5., 9.}}
 
 	// Perform the KNN search
 	k := 2
