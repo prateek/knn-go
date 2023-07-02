@@ -20,7 +20,7 @@ var genVectors = rapid.SliceOf(genVector).Filter(func(vecs []Vector) bool {
 	return len(vecs) > 0
 })
 
-func TestNaiveKNNReturnsKVectors(t *testing.T) {
+func TestRapidNaiveKNNReturnsKVectors(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		target := genVector.Draw(t, "target")
 		vecs := genVectors.Draw(t, "vecs")
@@ -36,7 +36,7 @@ func TestNaiveKNNReturnsKVectors(t *testing.T) {
 	})
 }
 
-func TestNaiveKNNReturnsSameVectors(t *testing.T) {
+func TestRapidNaiveKNNReturnsSameVectors(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		target := genVector.Draw(t, "target")
 		vecs := genVectors.Draw(t, "vecs")
@@ -57,7 +57,7 @@ func TestNaiveKNNReturnsSameVectors(t *testing.T) {
 	})
 }
 
-func TestNaiveKNNReturnsInitialSetVectors(t *testing.T) {
+func TestRapidNaiveKNNReturnsInitialSetVectors(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		target := genVector.Draw(t, "target")
 		vecs := genVectors.Draw(t, "vecs")
@@ -84,7 +84,7 @@ func TestNaiveKNNReturnsInitialSetVectors(t *testing.T) {
 	})
 }
 
-func TestNaiveKNNReturnsClosestVectors(t *testing.T) {
+func TestRapidNaiveKNNReturnsClosestVectors(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		target := genVector.Draw(t, "target")
 		vecs := genVectors.Draw(t, "vecs")
@@ -126,7 +126,7 @@ func TestNaiveKNNReturnsClosestVectors(t *testing.T) {
 	})
 }
 
-func TestNaiveKNNReturnsOrderedVectors(t *testing.T) {
+func TestRapidNaiveKNNReturnsOrderedVectors(t *testing.T) {
 	rapid.Check(t, func(t *rapid.T) {
 		target := genVector.Draw(t, "target")
 		vecs := genVectors.Draw(t, "vecs")
