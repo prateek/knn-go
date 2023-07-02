@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/leanovate/gopter v0.2.9
 	github.com/stretchr/testify v1.8.3
+	pgregory.net/rapid v1.0.0
 )
 
 require (
